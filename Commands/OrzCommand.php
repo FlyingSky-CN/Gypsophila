@@ -36,25 +36,30 @@ class OrzCommand extends UserCommand
             if ($orzFrom->getId() === $orzTo->getId()) {
                 $text = 'Orz?';
             } else {
-                $orzFromName = ($orzFrom->getFirstName() && $orzFrom->getLastName()) ?
+                $orzFromName = htmlspecialchars(($orzFrom->getFirstName() && $orzFrom->getLastName()) ?
                     $orzFrom->getFirstName().' '.$orzFrom->getLastName() :
-                    $orzFrom->getFirstName().$orzFrom->getLastName();
+                    $orzFrom->getFirstName().$orzFrom->getLastName());
                 $orzFromId   = $orzFrom->getId();
-                $orzToName   = ($orzTo->getFirstName() && $orzTo->getLastName()) ?
+                $orzToName   = htmlspecialchars(($orzTo->getFirstName() && $orzTo->getLastName()) ?
                     $orzTo->getFirstName().' '.$orzTo->getLastName() :
-                    $orzTo->getFirstName().$orzTo->getLastName();
+                    $orzTo->getFirstName().$orzTo->getLastName());
                 $orzToId     = $orzTo->getId();
 
-                $text = "[$orzFromName](tg://user?id=$orzFromId) 膜了 [$orzToName](tg://user?id=$orzToId)";
+                $text = "<a href='tg://user?id=$orzFromId'>$orzFromName</a> 膜了 <a href='tg://user?id=$orzToId'>$orzToName</a>";
 
             }
 
         } else $text = 'Orz?';
 
+        Request::deleteMessage([
+            'chat_id' => $message->getChat()->getId(),
+            'message_id' => $message->getMessageId()
+        ]);
+
         return Request::sendMessage([
             'chat_id'    => $message->getChat()->getId(),
             'text'       => $text,
-            'parse_mode' => 'MarkdownV2'
+            'parse_mode' => 'HTML'
         ]);
     }
 }
